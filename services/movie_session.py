@@ -18,7 +18,7 @@ def create_movie_session(
     )
 
 
-def get_movies_sessions(session_date: str = None) -> QuerySet:
+def get_movies_sessions(session_date: Optional[str] = None) -> QuerySet:
     sessions = MovieSession.objects.all()
     if session_date:
         if session_date:
@@ -36,16 +36,17 @@ def update_movie_session(
         movie_id: Optional[int] = None,
         cinema_hall_id: Optional[int] = None
 ) -> None:
-    if not any([show_time, movie_id, cinema_hall_id]):
-        return
-    movie_session = get_movie_session_by_id(session_id)
+    update_fields = {}
+
     if show_time:
-        movie_session.show_time = show_time
+        update_fields["show_time"] = show_time
     if movie_id:
-        movie_session.movie_id = movie_id
+        update_fields["movie_id"] = movie_id
     if cinema_hall_id:
-        movie_session.cinema_hall_id = cinema_hall_id
-    movie_session.save()
+        update_fields["cinema_hall_id"] = cinema_hall_id
+
+    if update_fields:
+        MovieSession.objects.filter(pk=session_id).update(**update_fields)
 
 
 def delete_movie_session_by_id(session_id: int) -> None:
